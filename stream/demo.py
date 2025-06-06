@@ -5,7 +5,7 @@ st.title("通义千问")
 
 client = OpenAI(
     # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key="sk-xxx",
-    api_key=("sk-139a40229c0e4bd58191a7a2f8c9c8f3"),
+    api_key=("your api_key"),
     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
 )
 
