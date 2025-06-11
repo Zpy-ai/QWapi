@@ -1,17 +1,14 @@
 import streamlit as st
 from openai import OpenAI
 
-# 设置页面标题和配置
 st.set_page_config(page_title="千问Plus", layout="wide")
 st.title("🤖 通义千问Plus")
 
-# 初始化OpenAI客户端
 client = OpenAI(
     api_key="sk-139a40229c0e4bd58191a7a2f8c9c8f3",
     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
 )
 
-# 初始化聊天历史
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -32,21 +29,21 @@ def get_completion(text):
         st.error(f"发生错误: {str(e)}")
         return None
 
-# 显示聊天历史
+# 显示聊天历史，本质是循环再显示
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# 获取用户输入
+# 获取用户输入,海象运算符 := 一种赋值表达式，允许在表达式中同时进行赋值和条件判断
 if prompt := st.chat_input("请输入您的问题..."):
     # 添加用户消息到历史记录
     st.session_state.messages.append({"role": "user", "content": prompt})
     
-    # 显示用户消息
+    # 使用 st.chat_message("user") 创建一个代表用户的消息气泡,在消息气泡内显示用户输入的内容
     with st.chat_message("user"):
         st.markdown(prompt)
     
-    # 获取AI响应
+    # 使用 st.empty() 创建一个空容器，用于动态更新内容，创建 full_response 字符串，用于逐步构建完整的 AI 响应
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
@@ -58,7 +55,7 @@ if prompt := st.chat_input("请输入您的问题..."):
                 for chunk in response:
                     if hasattr(chunk, 'choices') and chunk.choices and hasattr(chunk.choices[0], 'delta') and hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
                         full_response += chunk.choices[0].delta.content
-                        message_placeholder.markdown(full_response + "▌")
+                        message_placeholder.markdown(full_response + "▌")# 使用▌字符模拟打字光标，增强交互感。
                 
                 message_placeholder.markdown(full_response)
                 
@@ -70,12 +67,12 @@ if prompt := st.chat_input("请输入您的问题..."):
             except Exception as e:
                 st.error(f"处理响应时发生错误: {str(e)}")
 
-# 添加清除聊天按钮
+
 if st.sidebar.button("清除聊天历史"):
     st.session_state.messages = []
-    st.experimental_rerun()
+    st.rerun()  # 重新运行应用，使界面更新反映清除后的状态
 
-# 添加侧边栏说明
+
 with st.sidebar:
     st.markdown("""
     ### 使用说明
